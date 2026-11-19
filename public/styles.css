@@ -55,7 +55,7 @@ h1 { margin: 10px 0 12px; font-size: clamp(2.65rem, 6.1vw, 4.05rem); letter-spac
 .report { margin-top: 30px; }
 .report-heading { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 15px; }
 .report-kicker { font-size: .73rem; color: var(--muted); }
-h2 { margin: 2px 0 0; font-size: 1.55rem; line-height: 1.2; letter-spacing: -.042em; }
+h2 { margin: 2px 0 0; font-size: 1.55rem; line-height: 1.2; letter-spacing: -.042em; overflow-wrap: anywhere; }
 .report-actions { display: flex; align-items: center; gap: 10px; }
 .report-status { background: var(--tint); color: var(--accent-dark); border-radius: 99px; padding: 4px 10px; font-size: .81rem; font-weight: 700; white-space: nowrap; }
 .report-status[data-state="complete"] { background: #e7f5ed; color: #216045; }
@@ -84,13 +84,13 @@ details[open] > summary::after { transform: rotate(225deg); margin-bottom: -3px;
 .finding-icon[data-category="API"] { background: #e9f0ff; color: #3153a5; }
 .finding-title { min-width: 0; margin-right: auto; }
 .finding-title strong { display: block; font-size: .94rem; line-height: 1.35; overflow-wrap: anywhere; }
-.finding-title small { display: block; color: var(--muted); font-size: .79rem; }
+.finding-title small { display: block; color: var(--muted); font-size: .79rem; overflow-wrap: anywhere; }
 .severity { font-size: .76rem; font-weight: 760; border-radius: 5px; padding: 2px 7px; color: #8c5120; background: #fff0dd; }
 .severity.high { color: #9b3240; background: #ffecef; }
 .finding-body { padding: 2px 9px 16px 42px; }
 .finding-body h4 { margin: 14px 0 5px; font-size: .87rem; }
 .finding-body ol { margin: 0; padding-left: 20px; }
-.finding-body p, .finding-body li { margin: 2px 0; font-size: .89rem; color: #454e69; }
+.finding-body p, .finding-body li { margin: 2px 0; font-size: .89rem; color: #454e69; overflow-wrap: anywhere; }
 .evidence { overflow: auto; background: #f5f6fb; border: 1px solid var(--line); border-radius: 7px; padding: 10px; font-size: .8rem; white-space: pre-wrap; overflow-wrap: anywhere; }
 .screenshot { display: block; width: 100%; border: 1px solid var(--line); border-radius: 8px; }
 .run-details { padding: 14px 15px 13px; }

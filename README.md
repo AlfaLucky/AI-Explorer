@@ -1,10 +1,12 @@
 # AI Explorer
 
-AI Explorer autonomously explores Fieldwork, a demo project-management workspace. It discovers visible links, buttons, and forms in Chromium, submits ordinary sample data, and checks the published demo API contract. The exploration rules are shared across screens. There are no scripted per-screen test cases in the runner.
+AI Explorer has two exploration modes. Public website exploration reads HTML, follows same-site navigation links, and reports failed page loads, HTTP errors, and redirect loops. Fieldwork is an interactive project-management demo that adds Chromium actions, sample form data, browser exceptions, and API contract checks. The agents discover links and controls during the run.
 
 [Open the live Railway demo](https://ai-explorer-production-2c9618b3.up.railway.app/).
 
-Open the dashboard, keep the prefilled Fieldwork URL or enter one of its screen URLs, and select **Run exploration**. The dashboard streams activity as it happens. Expand a finding for reproduction steps, expected and observed behavior, and available logs or screenshots. **Download JSON** exports the report and includes captured screenshots.
+Enter a public website URL, or use **Use demo URL** to try Fieldwork, and select **Run exploration**. The dashboard streams activity as it happens. Expand a finding for reproduction steps and expected versus observed behavior. **Download JSON** exports the report along with available evidence.
+
+For public sites, each run makes read-only GET requests and checks up to six pages. It respects `robots.txt` and follows links to HTML pages within the entered site. Public runs cover server responses and navigation. Interactive controls, JavaScript execution, screenshots, and API contract checks are available in Fieldwork.
 
 Fieldwork contains three intentional functional defects for the demo. The Activity view throws an unhandled JavaScript exception, Settings returns HTTP 500 when saving valid preferences, and the Projects Summary API returns a string in an integer field. Demo project changes are isolated to the browser session.
 

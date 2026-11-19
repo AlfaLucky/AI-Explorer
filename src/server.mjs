@@ -4,6 +4,8 @@ import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { demoResponse, isDemoPage } from './demo.mjs';
 import { explore } from './explorer.mjs';
+import { explorePublic } from './public-explorer.mjs';
+import { publicUrl } from './public-http.mjs';
 
 const assets = {
   '/': ['index.html', 'text/html; charset=utf-8'],
@@ -61,21 +63,30 @@ export function createExplorerServer({ publicOrigin = process.env.PUBLIC_ORIGIN,
         const defaults = [base, `http://localhost:${port}`, `http://[::1]:${port}`];
         const origins = new Set(publicOrigin ? [new URL(publicOrigin).origin, ...defaults] : defaults);
         if (railwayDomain) origins.add(`https://${railwayDomain}`);
-        const target = resolveTarget(await readTarget(req), origins);
-        if (!target) return json(res, 400, { error: 'Enter a Fieldwork demo URL from this AI Explorer instance.' });
+        const input = await readTarget(req);
+        const target = resolveTarget(input, origins);
+        const external = target ? null : publicUrl(input);
+        if (!target && (!external || origins.has(external.origin))) {
+          return json(res, 400, { error: 'Enter a public website address or a Fieldwork demo URL.' });
+        }
         if (active || Date.now() < nextRunAt) return json(res, 429, { error: 'The explorer is busy. Wait a few seconds and try again.' });
         active = true;
+        const client = new AbortController();
+        res.once('close', () => client.abort());
         res.writeHead(200, { 'Content-Type': 'application/x-ndjson; charset=utf-8', 'X-Accel-Buffering': 'no' });
         const publish = (message) => {
           if (!res.destroyed) res.write(`${JSON.stringify(message)}\n`);
         };
         publish({ type: 'started' });
         try {
-          const report = await explore({ base, target, publish: (event) => publish({ type: 'event', event }) });
+          const onEvent = (event) => publish({ type: 'event', event });
+          const report = external
+            ? await explorePublic({ target: external.href, publish: onEvent, signal: client.signal })
+            : await explore({ base, target, publish: onEvent });
           publish({ type: 'completed', report });
         } catch (error) {
           console.error('Exploration failed:', error.message);
-          publish({ type: 'error', message: 'The browser run could not finish. Try again in a few seconds.' });
+          publish({ type: 'error', message: 'The exploration could not finish. Try again in a few seconds.' });
         } finally {
           active = false;
           nextRunAt = Date.now() + cooldownMs;

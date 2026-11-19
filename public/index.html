@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="AI Explorer is an autonomous browser and API testing demo for exploratory QA.">
+  <meta name="description" content="Explore public websites and investigate browser and API defects in the interactive Fieldwork demo.">
   <title>AI Explorer · Exploratory QA</title>
   <link rel="stylesheet" href="/styles.css">
   <script type="module" src="/app.js"></script>
@@ -20,18 +20,18 @@
   <main class="frame">
     <section class="hero" aria-labelledby="title">
       <p class="eyebrow"><span></span> EXPLORATORY QA</p>
-      <h1 id="title">Explore without a script.</h1>
-      <p>Watch an agent discover screens, try forms, and check API responses. Every finding comes with the evidence to reproduce it.</p>
+      <h1 id="title">Explore websites without a script.</h1>
+      <p>Check page loading and links on public websites, or try interactive browser and API testing in Fieldwork.</p>
     </section>
 
     <form class="launch" id="launch">
       <label for="target">Target URL</label>
       <div class="launch-controls">
-        <div class="url-field"><span class="link-icon" aria-hidden="true"></span><input id="target" name="target" type="url" autocomplete="off" spellcheck="false" required aria-describedby="target-hint"></div>
+        <div class="url-field"><span class="link-icon" aria-hidden="true"></span><input id="target" name="target" type="text" inputmode="url" placeholder="https://example.com" maxlength="1800" autocomplete="off" spellcheck="false" required aria-describedby="target-hint"></div>
         <button type="button" class="secondary" id="use-demo">Use demo URL</button>
         <button type="submit" class="primary" id="run"><span class="play" aria-hidden="true"></span><span id="run-label">Run exploration</span></button>
       </div>
-      <p class="launch-hint" id="target-hint">This instance explores Fieldwork, the built-in demo workspace.</p>
+      <p class="launch-hint" id="target-hint">Public URLs run a read-only check of up to six pages. Use Fieldwork for forms, browser errors, and API contracts.</p>
       <p class="error" id="error" role="alert" hidden></p>
     </form>
 
@@ -42,9 +42,9 @@
       </div>
 
       <dl class="metrics" aria-label="Run summary">
-        <div><dt>Screens visited</dt><dd id="screens">—</dd></div>
-        <div><dt>Actions taken</dt><dd id="actions">—</dd></div>
-        <div><dt>API responses</dt><dd id="requests">—</dd></div>
+        <div><dt id="pages-label">Screens visited</dt><dd id="screens">—</dd></div>
+        <div><dt id="actions-label">Actions taken</dt><dd id="actions">—</dd></div>
+        <div><dt id="requests-label">API responses</dt><dd id="requests">—</dd></div>
         <div class="finding-metric"><dt>Findings</dt><dd id="count">—</dd></div>
       </dl>
 
@@ -61,8 +61,8 @@
         </div>
         <aside class="panel run-details" aria-labelledby="details-heading">
           <h3 id="details-heading">Run details</h3>
-          <dl><div><dt>Mode</dt><dd id="mode">—</dd></div><div><dt>Duration</dt><dd id="duration">—</dd></div><div><dt>Browser</dt><dd>Chromium</dd></div></dl>
-          <h4>Visited screens</h4>
+          <dl><div><dt>Mode</dt><dd id="mode">—</dd></div><div><dt>Duration</dt><dd id="duration">—</dd></div><div><dt>Engine</dt><dd id="engine">Chromium</dd></div></dl>
+          <h4 id="visited-label">Visited screens</h4>
           <ul id="visited"><li class="muted">Loading…</li></ul>
         </aside>
       </div>

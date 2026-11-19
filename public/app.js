@@ -22,6 +22,24 @@ function status(text, state) {
   element.dataset.state = state;
 }
 
+function setReportLabels(host = '') {
+  const external = Boolean(host);
+  byId('report-title').textContent = host || 'Fieldwork workspace';
+  byId('pages-label').textContent = external ? 'Pages checked' : 'Screens visited';
+  byId('actions-label').textContent = external ? 'Links followed' : 'Actions taken';
+  byId('requests-label').textContent = external ? 'HTTP responses' : 'API responses';
+  byId('tab-requests').textContent = external ? 'HTTP traffic' : 'API traffic';
+  byId('engine').textContent = external ? 'HTTP and HTML' : 'Chromium';
+  byId('visited-label').textContent = external ? 'Checked pages' : 'Visited screens';
+}
+
+function externalHost(value) {
+  try {
+    const url = new URL(value.includes('://') ? value : `https://${value}`);
+    return url.origin === location.origin ? '' : url.hostname;
+  } catch { return ''; }
+}
+
 function seconds(elapsedMs) { return `${(elapsedMs / 1000).toFixed(1)}s`; }
 
 function selectTab(tab, focus = false) {
@@ -98,24 +116,36 @@ function metrics({ screens, actions, requests, findings }) {
 function showReport(value, sample) {
   report = value;
   phase = 'ready';
+  const external = value.mode === 'public';
+  setReportLabels(external ? new URL(value.target).hostname : '');
   metrics({ screens: value.screens.length, actions: value.actions, requests: value.requests.length, findings: value.findings.length });
-  byId('mode').textContent = sample ? 'Recorded demo' : 'Live exploration';
+  byId('mode').textContent = sample ? 'Recorded demo' : external ? 'Public site' : 'Fieldwork live';
   byId('duration').textContent = seconds(value.durationMs);
   status(sample ? 'Sample report' : value.limited ? 'Partial run' : 'Run complete', sample || value.limited ? 'sample' : 'complete');
   const screens = value.screens.map((path) => {
     const item = node('li');
-    const link = node('a', path);
+    const url = new URL(path, location.origin);
+    const link = node('a', external ? `${url.pathname}${url.search}` : path);
     link.href = path;
+    if (external) {
+      link.title = url.href;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+    }
     item.append(link);
     return item;
   });
+  if (!screens.length) screens.push(node('li', 'No pages could be checked.', 'muted'));
   byId('visited').replaceChildren(...screens);
   const findings = [...value.findings].sort((a, b) => Number(b.severity === 'High') - Number(a.severity === 'High'));
-  findingsPanel.replaceChildren(...(findings.length ? findings.map(renderFinding) : [node('p', 'No issues were detected in the visited screens.', 'empty')]));
+  const emptyFindings = value.limited
+    ? 'No issues were detected in this partial run. See the activity log for limits.'
+    : 'No issues were detected in the pages checked.';
+  findingsPanel.replaceChildren(...(findings.length ? findings.map(renderFinding) : [node('p', emptyFindings, 'empty')]));
   const timeline = node('ol', '', 'timeline');
   timeline.append(...value.timeline.map(timelineEvent));
   timelinePanel.replaceChildren(timeline);
-  requestsPanel.replaceChildren(...(value.requests.length ? value.requests.map(renderRequest) : [node('p', 'No API responses were recorded.', 'empty')]));
+  requestsPanel.replaceChildren(...(value.requests.length ? value.requests.map(renderRequest) : [node('p', 'No responses were recorded.', 'empty')]));
   exportButton.disabled = false;
 }
 
@@ -171,23 +201,27 @@ byId('launch').addEventListener('submit', async (event) => {
   byId('run').disabled = true;
   byId('run-label').textContent = 'Exploring…';
   exportButton.disabled = true;
-  status('Exploring Fieldwork', 'running');
-  byId('mode').textContent = 'Live exploration';
+  const input = target.value.trim();
+  const host = externalHost(input);
+  setReportLabels(host);
+  status(host ? 'Exploring public site' : 'Exploring Fieldwork', 'running');
+  byId('mode').textContent = host ? 'Public site' : 'Fieldwork live';
   const live = { screens: 0, actions: 0, requests: 0, findings: 0 };
   metrics(live);
   byId('duration').textContent = '—';
-  byId('visited').replaceChildren(node('li', 'Visiting demo screens…', 'muted'));
+  byId('visited').replaceChildren(node('li', host ? 'Checking pages…' : 'Visiting demo screens…', 'muted'));
   findingsPanel.replaceChildren(node('p', 'Findings appear when the run finishes.', 'empty'));
-  requestsPanel.replaceChildren(node('p', 'Collecting API responses…', 'empty'));
+  requestsPanel.replaceChildren(node('p', 'Collecting responses…', 'empty'));
   const progress = node('ol', '', 'timeline');
   timelinePanel.replaceChildren(progress);
   selectTab(byId('tab-timeline'));
   try {
-    const response = await fetch('/api/runs', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ target: target.value.trim() }) });
+    const response = await fetch('/api/runs', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ target: input }) });
     const result = await readRun(response, (step) => {
       progress.append(timelineEvent(step));
-      const counter = { navigation: 'screens', action: 'actions', api: 'requests', finding: 'findings' }[step.kind];
-      if (counter) live[counter] += 1;
+      const counter = { navigation: 'screens', action: 'actions', api: 'requests', http: 'requests', finding: 'findings' }[step.kind];
+      if (counter && !(host && step.kind === 'navigation')) live[counter] += 1;
+      if (step.checked) live.screens += 1;
       metrics(live);
     });
     showReport(result, false);
