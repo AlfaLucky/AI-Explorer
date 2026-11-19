@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="AI Explorer is an autonomous browser and API testing demo for exploratory QA.">
+  <title>AI Explorer · Exploratory QA</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="frame topbar-inner">
+      <a class="brand" href="/" aria-label="AI Explorer home"><span class="brand-mark" aria-hidden="true"></span>AI Explorer</a>
+      <nav class="navigation" aria-label="Main navigation">
+        <a href="/" aria-current="page">Explorer</a><a href="/demo/">Fieldwork demo</a>
+      </nav>
+    </div>
+  </header>
+  <main class="frame">
+    <section class="hero" aria-labelledby="title">
+      <p class="eyebrow"><span></span> EXPLORATORY QA</p>
+      <h1 id="title">Explore without a script.</h1>
+      <p>Watch an agent discover screens, try forms, and check API responses. Every finding comes with the evidence to reproduce it.</p>
+    </section>
+
+    <form class="launch" id="launch">
+      <label for="target">Target URL</label>
+      <div class="launch-controls">
+        <div class="url-field"><span class="link-icon" aria-hidden="true"></span><input id="target" name="target" type="url" autocomplete="off" spellcheck="false" required aria-describedby="target-hint"></div>
+        <button type="button" class="secondary" id="use-demo">Use demo URL</button>
+        <button type="submit" class="primary" id="run"><span class="play" aria-hidden="true"></span><span id="run-label">Run exploration</span></button>
+      </div>
+      <p class="launch-hint" id="target-hint">This instance explores Fieldwork, the built-in demo workspace.</p>
+      <p class="error" id="error" role="alert" hidden></p>
+    </form>
+
+    <section class="report" aria-labelledby="report-title">
+      <div class="report-heading">
+        <div><p class="eyebrow report-kicker">EXPLORATION REPORT</p><h2 id="report-title">Fieldwork workspace</h2></div>
+        <div class="report-actions"><span class="report-status" id="report-status" role="status">Loading sample</span><button class="secondary export" type="button" id="export" disabled>Download JSON</button></div>
+      </div>
+
+      <dl class="metrics" aria-label="Run summary">
+        <div><dt>Screens visited</dt><dd id="screens">—</dd></div>
+        <div><dt>Actions taken</dt><dd id="actions">—</dd></div>
+        <div><dt>API responses</dt><dd id="requests">—</dd></div>
+        <div class="finding-metric"><dt>Findings</dt><dd id="count">—</dd></div>
+      </dl>
+
+      <div class="report-grid">
+        <div class="panel findings-panel">
+          <div class="tabs" role="tablist" aria-label="Report views">
+            <button type="button" id="tab-findings" role="tab" aria-controls="findings-panel" aria-selected="true">Findings</button>
+            <button type="button" id="tab-timeline" role="tab" aria-controls="timeline-panel" aria-selected="false" tabindex="-1">Activity log</button>
+            <button type="button" id="tab-requests" role="tab" aria-controls="requests-panel" aria-selected="false" tabindex="-1">API traffic</button>
+          </div>
+          <section class="tab-content" id="findings-panel" role="tabpanel" aria-labelledby="tab-findings" tabindex="0"><p class="empty">Loading the sample report…</p></section>
+          <section class="tab-content" id="timeline-panel" role="tabpanel" aria-labelledby="tab-timeline" tabindex="0" hidden></section>
+          <section class="tab-content" id="requests-panel" role="tabpanel" aria-labelledby="tab-requests" tabindex="0" hidden></section>
+        </div>
+        <aside class="panel run-details" aria-labelledby="details-heading">
+          <h3 id="details-heading">Run details</h3>
+          <dl><div><dt>Mode</dt><dd id="mode">—</dd></div><div><dt>Duration</dt><dd id="duration">—</dd></div><div><dt>Browser</dt><dd>Chromium</dd></div></dl>
+          <h4>Visited screens</h4>
+          <ul id="visited"><li class="muted">Loading…</li></ul>
+        </aside>
+      </div>
+    </section>
+  </main>
+  <footer class="frame footer"><span>AI Explorer</span><a href="https://github.com/AlfaLucky/AI-Explorer">Source on GitHub</a></footer>
+</body>
+</html>
