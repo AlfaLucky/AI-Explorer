@@ -22,4 +22,6 @@ Open [AI Explorer](http://127.0.0.1:3000) or the [Fieldwork demo](http://127.0.0
 
 ## Deploy on Railway
 
-Connect the GitHub repository as the source of a Railway service and choose `main` as the deployment branch. Subsequent pushes to `main` trigger new builds. The checked-in Dockerfile installs the matching Playwright package and Chromium runtime. `railway.toml` defines the `/healthz` health check. Generate a public Railway domain for the dashboard. If you add a custom domain, set `PUBLIC_ORIGIN` to its HTTPS origin so visitors can run the demo from that domain.
+The **Deploy to Railway** GitHub Actions workflow uploads each push to `main` to the `ai-explorer` Railway service. It uses the `RAILWAY_TOKEN` repository secret, a project token scoped to the Railway production environment.
+
+The checked-in Dockerfile installs the matching Playwright package and Chromium runtime. The Railway service uses `/healthz` as its health check. If you add a custom domain, set `PUBLIC_ORIGIN` to its HTTPS origin so visitors can run the demo from that domain.
